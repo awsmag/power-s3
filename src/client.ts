@@ -128,4 +128,20 @@ export class Client {
 
     return this._s3.getSignedUrlPromise("getObject", {...params, Expires: expires});
   }
+
+    /**
+     * Lists all objects in a bucket, optionally filtered by a prefix.
+     * @param {string} bucket - The name of the bucket.
+     * @param {string} [prefix] - An optional prefix to filter the results.
+     * @returns {Promise<S3.ObjectList>} - A list of objects in the bucket.
+     */
+    async listObjects(bucket: string, prefix?: string): Promise<S3.ObjectList> {
+      const params: S3.ListObjectsV2Request = {
+          Bucket: bucket,
+          Prefix: prefix
+      };
+
+      const response = await this._s3.listObjectsV2(params).promise();
+      return response.Contents || [];
+  }
 }
