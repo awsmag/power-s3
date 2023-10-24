@@ -102,11 +102,7 @@ export class Client {
    * @param {number} [expires] - Expiration time for the pre-signed URL in seconds. Default is 15 minutes (900 seconds).
    * @returns {Promise<Buffer | string>} - Returns the file data as a Buffer if usePresignedUrl is false. Returns a pre-signed URL if usePresignedUrl is true.
    */
-  async downloadFile(
-    bucket: string,
-    key: string,
-  ): Promise<Buffer | string> {
-
+  async downloadFile(bucket: string, key: string): Promise<Buffer | string> {
     const params: S3.GetObjectRequest = {
       Bucket: bucket,
       Key: key,
@@ -123,25 +119,46 @@ export class Client {
   ): Promise<string> {
     const params: S3.GetObjectRequest = {
       Bucket: bucket,
-      Key: key
+      Key: key,
     };
 
-    return this._s3.getSignedUrlPromise("getObject", {...params, Expires: expires});
+    return this._s3.getSignedUrlPromise("getObject", {
+      ...params,
+      Expires: expires,
+    });
   }
 
-    /**
-     * Lists all objects in a bucket, optionally filtered by a prefix.
-     * @param {string} bucket - The name of the bucket.
-     * @param {string} [prefix] - An optional prefix to filter the results.
-     * @returns {Promise<S3.ObjectList>} - A list of objects in the bucket.
-     */
-    async listObjects(bucket: string, prefix?: string): Promise<S3.ObjectList> {
-      const params: S3.ListObjectsV2Request = {
-          Bucket: bucket,
-          Prefix: prefix
-      };
+  /**
+   * Lists all objects in a bucket, optionally filtered by a prefix.
+   * @param {string} bucket - The name of the bucket.
+   * @param {string} [prefix] - An optional prefix to filter the results.
+   * @returns {Promise<S3.ObjectList>} - A list of objects in the bucket.
+   */
+  async listObjects(bucket: string, prefix?: string): Promise<S3.ObjectList> {
+    const params: S3.ListObjectsV2Request = {
+      Bucket: bucket,
+      Prefix: prefix,
+    };
 
-      const response = await this._s3.listObjectsV2(params).promise();
-      return response.Contents || [];
+    const response = await this._s3.listObjectsV2(params).promise();
+    return response.Contents || [];
+  }
+
+  /**
+   * Deletes a file from a specified S3 bucket and key.
+   * @param {string} bucket - The name of the bucket.
+   * @param {string} key - The key (path) of the file in the bucket.
+   * @returns {Promise<S3.DeleteObjectOutput>} - The result of the delete operation.
+   */
+  async deleteFile(
+    bucket: string,
+    key: string
+  ): Promise<S3.DeleteObjectOutput> {
+    const params: S3.DeleteObjectRequest = {
+      Bucket: bucket,
+      Key: key,
+    };
+
+    return this._s3.deleteObject(params).promise();
   }
 }
