@@ -161,4 +161,26 @@ export class Client {
 
     return this._s3.deleteObject(params).promise();
   }
+
+  /**
+   * Deletes multiple files from a specified S3 bucket.
+   * @param {string} bucket - The name of the bucket.
+   * @param {string[]} keys - An array of keys (paths) of the files in the bucket to be deleted.
+   * @returns {Promise<S3.DeleteObjectsOutput>} - The result of the batch delete operation.
+   */
+  async deleteFiles(
+    bucket: string,
+    keys: string[]
+  ): Promise<S3.DeleteObjectsOutput> {
+    const objectsToDelete = keys.map((key) => ({ Key: key }));
+
+    const params: S3.DeleteObjectsRequest = {
+      Bucket: bucket,
+      Delete: {
+        Objects: objectsToDelete,
+      },
+    };
+
+    return this._s3.deleteObjects(params).promise();
+  }
 }
