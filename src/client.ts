@@ -5,8 +5,8 @@ export class Client {
   private _s3: S3;
   private readonly CHUNK_SIZE = 5 * 1024 * 1024; // 5MB
 
-  constructor(config: S3.ClientConfiguration) {
-    this._s3 = new S3(config);
+  constructor(S3Client: S3) {
+    this._s3 = S3Client
   }
 
   async uploadFile(
